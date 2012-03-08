@@ -11,9 +11,12 @@ import javax.persistence.IdClass;
 
 import me.prettyprint.hom.CFMappingDef;
 import me.prettyprint.hom.ClassCacheMgr;
+import me.prettyprint.hom.ClassFieldsHelper;
 import me.prettyprint.hom.KeyDefinition;
 
 public class IdClassParserValidator implements ParserValidator {
+
+  ClassFieldsHelper classFieldsPropertiesHelper = new ClassFieldsHelper();
 
   @Override
   public <T> void parse(ClassCacheMgr cacheMgr, Annotation anno, CFMappingDef<T> cfMapDef) {
@@ -28,28 +31,32 @@ public class IdClassParserValidator implements ParserValidator {
   @Override
   public <T> void validateAndSetDefaults(ClassCacheMgr cacheMgr, CFMappingDef<T> cfMapDef) {
     KeyDefinition keyDef = cfMapDef.getKeyDef();
-    
-    if ( null == keyDef.getPkClazz() ) {
+
+    if (null == keyDef.getPkClazz()) {
       return;
     }
-    
+
     Map<String, PropertyDescriptor> pdMap;
     try {
-      pdMap = cacheMgr.getFieldPropertyDescriptorMap(keyDef.getPkClazz());
+      pdMap = classFieldsPropertiesHelper.getFieldPropertyDescriptorMap(keyDef.getPkClazz());
     } catch (IntrospectionException e) {
       throw new HectorObjectMapperException("exception while introspecting class, "
           + keyDef.getPkClazz().getName(), e);
     }
-    
-    if ( keyDef.getIdPropertyMap().size() != pdMap.size() ) {
-      throw new HectorObjectMapperException("Each field in the primary key class, " + keyDef.getPkClazz().getName()
-          + ", must have a corresponding property in the entity, " + cfMapDef.getRealClass().getName() + ", annotated with @" + Id.class.getSimpleName() );
+
+    if (keyDef.getIdPropertyMap().size() != pdMap.size()) {
+      throw new HectorObjectMapperException("Each field in the primary key class, "
+          + keyDef.getPkClazz().getName() + ", must have a corresponding property in the entity, "
+          + cfMapDef.getRealClass().getName() + ", annotated with @" + Id.class.getSimpleName());
     }
-    
-    for ( String idFieldName : pdMap.keySet() ) {
-      if ( !keyDef.getIdPropertyMap().containsKey(idFieldName)) {
-        throw new HectorObjectMapperException("Each field in the primary key class, " + keyDef.getPkClazz().getName()
-            + ", must have a corresponding property in the entity, " + cfMapDef.getRealClass().getName() + ", annotated with @" + Id.class.getSimpleName() + " : missing ID field, " + idFieldName);
+
+    for (String idFieldName : pdMap.keySet()) {
+      if (!keyDef.getIdPropertyMap().containsKey(idFieldName)) {
+        throw new HectorObjectMapperException("Each field in the primary key class, "
+            + keyDef.getPkClazz().getName()
+            + ", must have a corresponding property in the entity, "
+            + cfMapDef.getRealClass().getName() + ", annotated with @" + Id.class.getSimpleName()
+            + " : missing ID field, " + idFieldName);
       }
     }
   }

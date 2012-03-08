@@ -5,7 +5,6 @@ import me.prettyprint.hom.HectorObjectMapper;
 import me.prettyprint.hom.PropertyMappingDefinition;
 import me.prettyprint.hom.annotations.Column;
 
-
 /**
  * Default converter used when none specified in {@link Column} annotation. Uses
  * Java reflection to determine the Java type to use.
@@ -23,7 +22,8 @@ public class DefaultConverter implements Converter<Object> {
   @Override
   public byte[] convertObjTypeToCassType(Object value) {
     @SuppressWarnings("unchecked")
-    Serializer<Object> s = (Serializer<Object>) HectorObjectMapper.determineSerializer(value.getClass());
+    Serializer<Object> s = (Serializer<Object>) HectorObjectMapper.determineSerializer(value
+        .getClass());
     return s.toBytes(value);
   }
 

@@ -6,7 +6,7 @@ import me.prettyprint.hom.converters.Converter;
 public class ObjectConverter implements Converter<Object> {
 
   private static final ObjectSerializer OBJ_SER = ObjectSerializer.get();
-  
+
   @Override
   public Object convertCassTypeToObjType(PropertyMappingDefinition md, byte[] value) {
     return OBJ_SER.fromBytes(value);
@@ -16,5 +16,5 @@ public class ObjectConverter implements Converter<Object> {
   public byte[] convertObjTypeToCassType(Object value) {
     return OBJ_SER.toBytes(value);
   }
-  
+
 }

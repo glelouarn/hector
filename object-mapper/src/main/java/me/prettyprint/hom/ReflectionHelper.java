@@ -7,7 +7,6 @@ import me.prettyprint.hom.cache.HectorObjectMapperException;
 
 public class ReflectionHelper {
 
-
   public Object invokeGetter(Object obj, PropertyMappingDefinition md) {
     PropertyDescriptor pd = md.getPropDesc();
 
@@ -25,4 +24,3 @@ public class ReflectionHelper {
   }
 
 }
-

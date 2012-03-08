@@ -4,12 +4,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import me.prettyprint.hom.CFMappingDef;
+import me.prettyprint.hom.mapping.PropertiesMappingDefs;
 
 public interface ColumnParserValidator {
-
-  <T> void parse(Field field, Annotation anno, PropertyDescriptor pd, CFMappingDef<T> cfMapDef);
-
-//  <T> void validateAndSetDefaults(ClassCacheMgr cacheMgr, CFMappingDef<T> cfMapDef);
-  
+  <T> void parse(Field field, Annotation anno, PropertyDescriptor pd,
+      PropertiesMappingDefs propertiesMappingDefs);
 }

@@ -34,13 +34,11 @@ public class CollectionMapperHelper {
   public byte[] createCollectionInfoColValue(Collection<Object> coll) {
     // translate some classes that don't make as much sense when loaded
     String className = coll.getClass().getName();
-    if ( className.endsWith("$SingletonList")) {
+    if (className.endsWith("$SingletonList")) {
       className = "java.util.ArrayList";
-    }
-    else if ( className.endsWith("$SingletonMap")) {
+    } else if (className.endsWith("$SingletonMap")) {
       className = "java.util.HashMap";
-    }
-    else if ( className.endsWith("$SingletonSet")) {
+    } else if (className.endsWith("$SingletonSet")) {
       className = "java.util.HashSet";
     }
     return String.valueOf(className + ":" + coll.size()).getBytes();
@@ -102,7 +100,8 @@ public class CollectionMapperHelper {
 
     // get property from mapping def - if not there, then isn't a collection
     // (but probably a problem elsewhere)
-    PropertyMappingDefinition md = cfMapDef.getPropMapByColumnName(collColumnName.getPropertyName());
+    PropertyMappingDefinition md = cfMapDef
+        .getPropMapByColumnName(collColumnName.getPropertyName());
     if (null == md) {
       return false;
     }
@@ -245,4 +244,3 @@ public class CollectionMapperHelper {
     }
   }
 }
-

@@ -1,6 +1,5 @@
 package me.prettyprint.hom;
 
-
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -206,17 +205,18 @@ public class HectorObjectMapper {
   @SuppressWarnings("unchecked")
   private byte[] generateColumnFamilyKeyFromPkObj(CFMappingDef<?> cfMapDef, Object pkObj) {
     List<byte[]> segmentList = new ArrayList<byte[]>(cfMapDef.getKeyDef().getIdPropertyMap().size());
-    
-    if (cfMapDef.getKeyDef().isComplexKey()) {	
-      Map<String, PropertyDescriptor> propertyDescriptorMap = cfMapDef.getKeyDef().getPropertyDescriptorMap(); 	 
+
+    if (cfMapDef.getKeyDef().isComplexKey()) {
+      Map<String, PropertyDescriptor> propertyDescriptorMap = cfMapDef.getKeyDef()
+          .getPropertyDescriptorMap();
       for (String key : cfMapDef.getKeyDef().getIdPropertyMap().keySet()) {
-    	  PropertyDescriptor pd = propertyDescriptorMap.get(key);
-    	  segmentList.add(callMethodAndConvertToCassandraType(pkObj, pd.getReadMethod(),
-    	            new DefaultConverter()));
-      }	 
+        PropertyDescriptor pd = propertyDescriptorMap.get(key);
+        segmentList.add(callMethodAndConvertToCassandraType(pkObj, pd.getReadMethod(),
+            new DefaultConverter()));
+      }
     } else {
       PropertyMappingDefinition md = cfMapDef.getKeyDef().getIdPropertyMap().values().iterator()
-                                             .next();
+          .next();
       segmentList.add(md.getConverter().convertObjTypeToCassType(pkObj));
     }
 
@@ -368,9 +368,11 @@ public class HectorObjectMapper {
         String discColName = cfSuperMapDef.getDiscColumn();
         DiscriminatorType discType = cfSuperMapDef.getDiscType();
 
-        colSet.put(
-            discColName,
-            createHColumn(discColName, convertDiscTypeToColValue(discType, cfMapDef.getDiscValue())));
+        colSet
+            .put(
+                discColName,
+                createHColumn(discColName,
+                    convertDiscTypeToColValue(discType, cfMapDef.getDiscValue())));
       }
 
       addAnonymousProperties(obj, cfMapDef, colSet);
@@ -453,7 +455,8 @@ public class HectorObjectMapper {
 
     // save collection info
     Collection coll = (Collection) tmpColl;
-    colList.add(createHColumn(md.getColName(), collMapperHelper.createCollectionInfoColValue(coll)));
+    colList
+        .add(createHColumn(md.getColName(), collMapperHelper.createCollectionInfoColValue(coll)));
 
     // iterate over collection applying converter to its elements
     int count = 0;
@@ -571,7 +574,7 @@ public class HectorObjectMapper {
   private <T> void setSimpleId(CFMappingDef<T> cfMapDef, T obj, Object pkObj)
       throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
     PropertyMappingDefinition md = cfMapDef.getKeyDef().getIdPropertyMap().values().iterator()
-                                           .next();
+        .next();
     if (null == md) {
       throw new HectorObjectMapperException(
           "Trying to build new object but haven't annotated a field with @"
@@ -677,7 +680,7 @@ public class HectorObjectMapper {
     }
 
     meth.invoke(obj, col.getName(), cfMapDef.getAnonymousValueSerializer()
-                                            .fromBytes(col.getValue()));
+        .fromBytes(col.getValue()));
   }
 
   public void setKeyConcatStrategy(KeyConcatenationStrategy keyConcatStrategy) {

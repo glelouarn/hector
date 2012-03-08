@@ -37,7 +37,7 @@ public class KeyDefinition {
     }
 
     propertyDescriptorMap = new LinkedHashMap<String, PropertyDescriptor>();
-    for ( PropertyDescriptor pd : pdArr) {
+    for (PropertyDescriptor pd : pdArr) {
       propertyDescriptorMap.put(pd.getName(), pd);
     }
   }
@@ -55,8 +55,9 @@ public class KeyDefinition {
   }
 
   /**
-   * Determines if the key is complex (IdClass, Embedded, etc) or a simple one field type.
-   *
+   * Determines if the key is complex (IdClass, Embedded, etc) or a simple one
+   * field type.
+   * 
    * @return true if complex, false otherwise
    */
   public boolean isComplexKey() {
@@ -65,8 +66,9 @@ public class KeyDefinition {
 
   /**
    * Determines if a simple ID is present.
-   *
-   * @return true if the key is not a complex ID and at least one field was annotated with @Id.
+   * 
+   * @return true if the key is not a complex ID and at least one field was
+   *         annotated with @Id.
    */
   public boolean isSimpleIdPresent() {
     return !isComplexKey() && !idPropertyMap.isEmpty();

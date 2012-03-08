@@ -3,35 +3,24 @@ package me.prettyprint.hom;
 import java.beans.PropertyDescriptor;
 
 import me.prettyprint.hom.converters.Converter;
-import me.prettyprint.hom.converters.DefaultConverter;
-
 
 public class PropertyMappingDefinition {
   private PropertyDescriptor propDesc;
   private String colName;
   @SuppressWarnings("rawtypes")
   private Converter converter;
-  private Class<?> collectionType;
 
-  public Class<?> getCollectionType() {
-    return collectionType;
-  }
-
-  public void setCollectionType(Class<?> collectionType) {
-    this.collectionType = collectionType;
-  }
-
-  public PropertyMappingDefinition(PropertyDescriptor propDesc, String colName, @SuppressWarnings("rawtypes") Class<? extends Converter> converter)
-  throws InstantiationException, IllegalAccessException {
+  public PropertyMappingDefinition(PropertyDescriptor propDesc, String colName,
+      @SuppressWarnings("rawtypes") Converter converter) throws InstantiationException,
+      IllegalAccessException {
     this.propDesc = propDesc;
     this.colName = colName;
-    this.converter = converter.newInstance();
+    this.converter = converter;
   }
 
-  @Override
-  public String toString() {
-    return "PropertyMappingDefinition [colName=" + colName + ", converter=" + converter + ", propDesc=" + propDesc
-    + "]";
+  protected PropertyMappingDefinition(PropertyDescriptor propDesc, String colName) {
+    this.propDesc = propDesc;
+    this.colName = colName;
   }
 
   public PropertyDescriptor getPropDesc() {
@@ -47,12 +36,17 @@ public class PropertyMappingDefinition {
     return converter;
   }
 
-  public boolean isCollectionType() {
-    return null != collectionType;
+  @Override
+  public String toString() {
+    return "PropertyMappingDefinition [colName=" + colName + ", converter=" + converter
+        + ", propDesc=" + propDesc + "]";
   }
 
-  public boolean isDefaultConverter() {
-    return converter instanceof DefaultConverter;
+  public boolean isCollectionType() {
+    return false;
+  }
+
+  public boolean isEmbeddedType() {
+    return false;
   }
 }
-

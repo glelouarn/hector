@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +13,7 @@ import javax.persistence.InheritanceType;
 
 import me.prettyprint.hector.api.Serializer;
 import me.prettyprint.hom.cache.HectorObjectMapperException;
+import me.prettyprint.hom.mapping.PropertiesMappingDefs;
 
 import com.google.common.collect.Sets;
 
@@ -46,13 +46,13 @@ public class CFMappingDef<T> {
   private KeyDefinition keyDef;
 
   private Map<Object, CFMappingDef<? extends T>> derivedClassMap = new HashMap<Object, CFMappingDef<? extends T>>();
-  private Collection<PropertyMappingDefinition> allMappedProps;
 
-  // provide caching by class object for the class' mapping definition
-  private Map<String, PropertyMappingDefinition> propertyCacheByPropName = new HashMap<String, PropertyMappingDefinition>();
-
-  // provide caching by class object for the class' mapping definition
-  private Map<String, PropertyMappingDefinition> propertyCacheByColName = new HashMap<String, PropertyMappingDefinition>();
+  /**
+   * Class mapped properties defined in a single object to facilitate management
+   * of properties declared in {@link me.prettyprint.hom.annotations.Embeddable}
+   * class.
+   */
+  private PropertiesMappingDefs propertiesMappingDefs = new PropertiesMappingDefs();
 
   public CFMappingDef(Class<T> clazz) {
     setDefaults(clazz);
@@ -110,12 +110,8 @@ public class CFMappingDef<T> {
     derivedClassMap.put(cfDerivedMapDef.getDiscValue(), cfDerivedMapDef);
   }
 
-  public PropertyMappingDefinition getPropMapByPropName(String propName) {
-    return propertyCacheByPropName.get(propName);
-  }
-
   public PropertyMappingDefinition getPropMapByColumnName(String colName) {
-    PropertyMappingDefinition md = propertyCacheByColName.get(colName);
+    PropertyMappingDefinition md = propertiesMappingDefs.getPropMapByColumnName(colName);
     if (null != md) {
       return md;
     } else if (null != cfSuperMapDef) {
@@ -123,11 +119,6 @@ public class CFMappingDef<T> {
     } else {
       return null;
     }
-  }
-
-  public void addPropertyDefinition(PropertyMappingDefinition propDef) {
-    propertyCacheByColName.put(propDef.getColName(), propDef);
-    propertyCacheByPropName.put(propDef.getPropDesc().getName(), propDef);
   }
 
   public String getColFamName() {
@@ -199,20 +190,12 @@ public class CFMappingDef<T> {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Collection<PropertyMappingDefinition> getAllProperties() {
-    if (null == allMappedProps) {
-      Set<PropertyMappingDefinition> propSet = new HashSet<PropertyMappingDefinition>();
-      for (PropertyMappingDefinition propMapDef : propertyCacheByColName.values()) {
-        propSet.add(propMapDef);
-      }
-
-      if (null == cfSuperMapDef) {
-        allMappedProps = propSet;
-      } else {
-        allMappedProps = Sets.union(propSet, (Set) cfSuperMapDef.getAllProperties());
-      }
+    if (null == cfSuperMapDef) {
+      return propertiesMappingDefs.getMappedProps();
+    } else {
+      return Sets.union((Set) propertiesMappingDefs.getMappedProps(),
+          (Set) cfSuperMapDef.getAllProperties());
     }
-
-    return allMappedProps;
   }
 
   public CFMappingDef<? super T> getCfBaseMapDef() {
@@ -345,18 +328,11 @@ public class CFMappingDef<T> {
   // return null != sliceColumnNameArr && 0 < sliceColumnNameArr.length;
   // }
 
-  public Collection<PropertyMappingDefinition> getCollectionProperties() {
-    Set<PropertyMappingDefinition> collSet = new HashSet<PropertyMappingDefinition>();
-    for (PropertyMappingDefinition md : getAllProperties()) {
-      if (md.isCollectionType()) {
-        collSet.add(md);
-      }
-    }
-
-    return collSet;
-  }
-
   public void setAnonymousPropertyGetHandler(Method anonymousPropertyGetHandler) {
     this.anonymousPropertyGetHandler = anonymousPropertyGetHandler;
+  }
+
+  public PropertiesMappingDefs getPropertiesMappingDefs() {
+    return propertiesMappingDefs;
   }
 }

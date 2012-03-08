@@ -19,13 +19,15 @@ public class VariableIntegerConverterTest {
 
     byte b1 = 123;
     ba = conv.convertObjTypeToCassType(b1);
-    assertEquals(b1, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("b1", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(b1, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("b1", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
     Byte b2 = 1;
     ba = conv.convertObjTypeToCassType(b2);
-    assertEquals(b2, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("b2", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(b2, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("b2", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
   }
 
@@ -35,13 +37,15 @@ public class VariableIntegerConverterTest {
 
     int i1 = 123;
     ba = conv.convertObjTypeToCassType(i1);
-    assertEquals(i1, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("i1", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(i1, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("i1", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
     Integer i2 = 1;
     ba = conv.convertObjTypeToCassType(i2);
-    assertEquals(i2, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("i2", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(i2, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("i2", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
   }
 
@@ -51,13 +55,15 @@ public class VariableIntegerConverterTest {
 
     short s1 = 123;
     ba = conv.convertObjTypeToCassType(s1);
-    assertEquals(s1, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("s1", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(s1, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("s1", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
     Short s2 = 1;
     ba = conv.convertObjTypeToCassType(s2);
-    assertEquals(s2, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("s2", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(s2, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("s2", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
   }
 
@@ -67,13 +73,15 @@ public class VariableIntegerConverterTest {
 
     long l1 = 123;
     ba = conv.convertObjTypeToCassType(l1);
-    assertEquals(l1, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("l1", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(l1, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("l1", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
     Long l2 = 1L;
     ba = conv.convertObjTypeToCassType(l2);
-    assertEquals(l2, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("l2", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(l2, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("l2", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
 
   }
 
@@ -83,24 +91,27 @@ public class VariableIntegerConverterTest {
 
     BigInteger b1 = BigInteger.valueOf(123);
     ba = conv.convertObjTypeToCassType(b1);
-    assertEquals(b1, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("bigInt", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(b1, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("bigInt", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
   }
 
-  @Test(expected=HectorObjectMapperException.class)
+  @Test(expected = HectorObjectMapperException.class)
   public void testStringToCassNotWork() throws Exception {
     byte[] ba;
 
     String s1 = new String("123");
     ba = conv.convertObjTypeToCassType(s1);
-    assertEquals(s1, conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("str1", TestClass.class), "foo", VariableIntegerConverter.class), ba));
+    assertEquals(s1, conv.convertCassTypeToObjType(
+        new PropertyMappingDefinition(new PropertyDescriptor("str1", TestClass.class), "foo",
+            VariableIntegerConverter.class.newInstance()), ba));
   }
 
-  @Test(expected=HectorObjectMapperException.class)
+  @Test(expected = HectorObjectMapperException.class)
   public void testStringFromCassNotWork() throws Exception {
-    conv.convertCassTypeToObjType(new PropertyMappingDefinition(
-        new PropertyDescriptor("str1", TestClass.class), "foo", VariableIntegerConverter.class), new String("123").getBytes());
+    conv.convertCassTypeToObjType(new PropertyMappingDefinition(new PropertyDescriptor("str1",
+        TestClass.class), "foo", VariableIntegerConverter.class.newInstance()), new String("123")
+        .getBytes());
   }
 
   class TestClass {
@@ -117,7 +128,7 @@ public class VariableIntegerConverterTest {
     Long l2;
 
     BigInteger bigInt;
-    
+
     String str1; // should not work
 
     public String getStr1() {
@@ -199,7 +210,6 @@ public class VariableIntegerConverterTest {
     public void setB1(byte b1) {
       this.b1 = b1;
     }
-    
-    
+
   }
 }
