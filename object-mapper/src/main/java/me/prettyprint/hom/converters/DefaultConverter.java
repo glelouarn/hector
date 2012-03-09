@@ -22,8 +22,7 @@ public class DefaultConverter implements Converter<Object> {
   @Override
   public byte[] convertObjTypeToCassType(Object value) {
     @SuppressWarnings("unchecked")
-    Serializer<Object> s = (Serializer<Object>) HectorObjectMapper.determineSerializer(value
-        .getClass());
+    Serializer<Object> s = (Serializer<Object>) HectorObjectMapper.determineSerializer(value.getClass());
     return s.toBytes(value);
   }
 

@@ -110,8 +110,8 @@ public class VariableIntegerConverterTest {
   @Test(expected = HectorObjectMapperException.class)
   public void testStringFromCassNotWork() throws Exception {
     conv.convertCassTypeToObjType(new PropertyMappingDefinition(new PropertyDescriptor("str1",
-        TestClass.class), "foo", VariableIntegerConverter.class.newInstance()), new String("123")
-        .getBytes());
+        TestClass.class), "foo", VariableIntegerConverter.class.newInstance()),
+        new String("123").getBytes());
   }
 
   class TestClass {

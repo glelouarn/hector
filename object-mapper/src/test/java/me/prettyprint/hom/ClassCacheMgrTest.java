@@ -76,9 +76,10 @@ public class ClassCacheMgrTest {
         cacheMgr.getCfMapDef("TestBeanColumnFamily", false));
     assertEquals(MyTestBean.class, cfMapDef.getEffectiveClass());
     assertEquals("did not find @Id properly", "baseId", cfMapDef.getKeyDef().getIdPropertyMap()
-        .values().iterator().next().getPropDesc().getName());
-    assertEquals("did not setup properties properly", ColorConverter.class, cfMapDef
-        .getPropMapByColumnName("color").getConverter().getClass());
+                                                                .values().iterator().next()
+                                                                .getPropDesc().getName());
+    assertEquals("did not setup properties properly", ColorConverter.class,
+        cfMapDef.getPropMapByColumnName("color").getConverter().getClass());
   }
 
   @Test
@@ -132,7 +133,7 @@ public class ClassCacheMgrTest {
     assertEquals("myType", cfMapDef.getDiscColumn());
     assertEquals(DiscriminatorType.STRING, cfMapDef.getDiscType());
     assertEquals("baseId", cfMapDef.getKeyDef().getIdPropertyMap().values().iterator().next()
-        .getPropDesc().getName());
+                                   .getPropDesc().getName());
 
     // check super class settings
     assertEquals(MyRedTestBean.class.getSuperclass(), cfMapDef.getCfSuperMapDef().getRealClass());
@@ -150,20 +151,20 @@ public class ClassCacheMgrTest {
     assertNotNull(cfMapDef.getCfBaseMapDef());
     assertEquals(Desk.class.getSuperclass(), cfMapDef.getCfSuperMapDef().getEffectiveClass());
     assertEquals(Desk.class.getSuperclass().getSuperclass(), cfMapDef.getCfSuperMapDef()
-        .getCfSuperMapDef().getEffectiveClass());
+                                                                     .getCfSuperMapDef()
+                                                                     .getEffectiveClass());
     assertEquals(cfBaseMapDef.getEffectiveColFamName(), cfMapDef.getEffectiveColFamName());
     assertEquals("type", cfMapDef.getDiscColumn());
     assertEquals("table_desk", cfMapDef.getDiscValue());
     assertEquals(DiscriminatorType.STRING, cfMapDef.getDiscType());
     assertEquals("id", cfMapDef.getKeyDef().getIdPropertyMap().values().iterator().next()
-        .getPropDesc().getName());
+                               .getPropDesc().getName());
   }
 
   @Test
   public void testInheritanceOfNonEntity() {
     ClassCacheMgr cacheMgr = new ClassCacheMgr();
-    CFMappingDef<MyPurpleTestBean> cfMapDef = cacheMgr
-        .initializeCacheForClass(MyPurpleTestBean.class);
+    CFMappingDef<MyPurpleTestBean> cfMapDef = cacheMgr.initializeCacheForClass(MyPurpleTestBean.class);
 
     assertEquals(2, cfMapDef.getAllProperties().size());
     assertNull(cfMapDef.getCfBaseMapDef());
@@ -202,8 +203,7 @@ public class ClassCacheMgrTest {
   @Test
   public void testParsingEntityWithoutAnonymousAddHandler() {
     ClassCacheMgr cacheMgr = new ClassCacheMgr();
-    CFMappingDef<MyTestBeanNoAnonymous> cfMapDef = cacheMgr
-        .initializeCacheForClass(MyTestBeanNoAnonymous.class);
+    CFMappingDef<MyTestBeanNoAnonymous> cfMapDef = cacheMgr.initializeCacheForClass(MyTestBeanNoAnonymous.class);
 
     assertFalse("mapping should not indicate there is an anonymous handler",
         cfMapDef.isAnonymousHandlerAvailable());
@@ -228,8 +228,7 @@ public class ClassCacheMgrTest {
   @Test
   public void testParsingComplexEntity() {
     ClassCacheMgr cacheMgr = new ClassCacheMgr();
-    CFMappingDef<MyComplexEntity> cfMapDef = cacheMgr
-        .initializeCacheForClass(MyComplexEntity.class);
+    CFMappingDef<MyComplexEntity> cfMapDef = cacheMgr.initializeCacheForClass(MyComplexEntity.class);
 
     KeyDefinition keyDef = cfMapDef.getKeyDef();
     assertEquals(MyCompositePK.class, keyDef.getPkClazz());
@@ -263,7 +262,7 @@ public class ClassCacheMgrTest {
     CFMappingDef<CollectionBean> cfMapDef = cacheMgr.initializeCacheForClass(CollectionBean.class);
 
     PropertyMappingDefinition md = cfMapDef.getPropertiesMappingDefs()
-        .getPropMapByPropName("mySet");
+                                           .getPropMapByPropName("mySet");
     assertEquals(Set.class, ((PropertyMappingDefinitionCollection) md).getCollectionType());
     assertEquals("mySet", md.getColName());
     assertNull("should not be using slice query with List collection",
@@ -273,11 +272,10 @@ public class ClassCacheMgrTest {
   @Test
   public void testCollectionWithCustomConverterPropertyHandling() {
     ClassCacheMgr cacheMgr = new ClassCacheMgr();
-    CFMappingDef<CustomConvertedCollectionBean> cfMapDef = cacheMgr
-        .initializeCacheForClass(CustomConvertedCollectionBean.class);
+    CFMappingDef<CustomConvertedCollectionBean> cfMapDef = cacheMgr.initializeCacheForClass(CustomConvertedCollectionBean.class);
 
     PropertyMappingDefinition md = cfMapDef.getPropertiesMappingDefs()
-        .getPropMapByPropName("mySet");
+                                           .getPropMapByPropName("mySet");
     assertFalse(md.isCollectionType());
     assertEquals("mySet", md.getColName());
     assertNotNull("should be using slice query with custom converted collection",

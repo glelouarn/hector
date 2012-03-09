@@ -78,7 +78,7 @@ public class ClassFieldsHelper {
 
     // get descriptors for all properties in POJO
     PropertyDescriptor[] pdArr = Introspector.getBeanInfo(clazz, clazz.getSuperclass())
-        .getPropertyDescriptors();
+                                             .getPropertyDescriptors();
 
     // if no property descriptors then return leaving empty annotation map
     if (null == pdArr || 0 == pdArr.length) {

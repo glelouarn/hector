@@ -3,9 +3,9 @@ package me.prettyprint.hom;
 import java.beans.IntrospectionException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.persistence.DiscriminatorColumn;
@@ -20,6 +20,7 @@ import me.prettyprint.hom.cache.HectorObjectMapperException;
 import me.prettyprint.hom.cache.IdClassParserValidator;
 import me.prettyprint.hom.cache.InheritanceParserValidator;
 import me.prettyprint.hom.cache.TableParserValidator;
+import me.prettyprint.hom.mapping.PropertyMappingDefinitionEmbeddable;
 import me.prettyprint.hom.parser.CFMappingFieldsParser;
 
 /**
@@ -243,23 +244,59 @@ public class ClassCacheMgr {
 
   private void generateColumnSliceIfNeeded(CFMappingDef<?> cfMapDef) {
     if (cfMapDef.isColumnSliceRequired()) {
-      Collection<PropertyMappingDefinition> propColl = cfMapDef.getAllProperties();
+      // For result
+      ArrayList<String> resultColNames = new ArrayList<String>();
 
-      String[] columnNames = new String[cfMapDef.isPersistableEntity() ? propColl.size() : propColl
-          .size() + 1];
-      Iterator<PropertyMappingDefinition> iter = propColl.iterator();
-      int pos = 0;
-      while (iter.hasNext()) {
-        columnNames[pos++] = iter.next().getColName();
-      }
+      // Generation of column names
+      generateColNamesRecursiv(cfMapDef.getAllProperties(), "", resultColNames);
 
-      // if an inheritance hierarchy exists we need to add in the
-      // discriminator
+      // if an inheritance hierarchy exists we need to add in the discriminator
       // column
       if (!cfMapDef.isPersistableEntity()) {
-        columnNames[pos] = cfMapDef.getDiscColumn();
+        resultColNames.add(cfMapDef.getDiscColumn());
       }
-      cfMapDef.setSliceColumnNameArr(columnNames);
+
+      // Store result
+      cfMapDef.setSliceColumnNameArr((String[]) resultColNames.toArray(new String[0]));
+    }
+  }
+
+  /**
+   * Recursive function used to determine all property names.
+   * 
+   * @param propsMapDefs
+   *          Collection of properties.
+   * @param namePrefix
+   *          Prefix used to name properties, required for recursive calls.
+   * @param resultColNames
+   *          Result map of all constructed property names.
+   */
+  private void generateColNamesRecursiv(Collection<PropertyMappingDefinition> propsMapDefs,
+      String namePrefix, ArrayList<String> resultColNames) {
+    if (null != propsMapDefs) {
+      for (PropertyMappingDefinition currPropMapDef : propsMapDefs) {
+        // Column property, simply add name with prefix
+        if (!currPropMapDef.isEmbeddedType()) {
+          resultColNames.add(namePrefix + currPropMapDef.getColName());
+        }
+        // Embeddable property, recursive call to manage all embbeddable class
+        // properties
+        else {
+          // Embeddable property definition
+          PropertyMappingDefinitionEmbeddable embPropMapDef = (PropertyMappingDefinitionEmbeddable) currPropMapDef;
+
+          // Embeddable children properties
+          Collection<PropertyMappingDefinition> childrenProps = embPropMapDef.getPropertiesMappingDefs()
+                                                                             .getMappedProps();
+
+          // Prefix to use for children properties
+          String childrenPrefix = namePrefix + embPropMapDef.getColName()
+              + embPropMapDef.getNameSeparator();
+
+          // Recursive call to manage children names
+          generateColNamesRecursiv(childrenProps, childrenPrefix, resultColNames);
+        }
+      }
     }
   }
 

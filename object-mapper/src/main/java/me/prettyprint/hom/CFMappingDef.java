@@ -14,6 +14,7 @@ import javax.persistence.InheritanceType;
 import me.prettyprint.hector.api.Serializer;
 import me.prettyprint.hom.cache.HectorObjectMapperException;
 import me.prettyprint.hom.mapping.PropertiesMappingDefs;
+import me.prettyprint.hom.mapping.PropertyMappingDefinitionEmbeddable;
 
 import com.google.common.collect.Sets;
 
@@ -94,15 +95,27 @@ public class CFMappingDef<T> {
   }
 
   public boolean isAnyCollections() {
-    if (null == getAllProperties()) {
+    return isAnyCollections(getAllProperties());
+  }
+
+  private boolean isAnyCollections(Collection<PropertyMappingDefinition> propsDefs) {
+    if (null == propsDefs) {
       return false;
     }
 
-    for (PropertyMappingDefinition md : getAllProperties()) {
+    for (PropertyMappingDefinition md : propsDefs) {
+      // Contains collection?
       if (md.isCollectionType()) {
         return true;
       }
+      // Contains Embedded element containing collection?
+      else if ((md.isEmbeddedType())
+          && (isAnyCollections(((PropertyMappingDefinitionEmbeddable) md).getPropertiesMappingDefs()
+                                                                         .getMappedProps()))) {
+        return true;
+      }
     }
+
     return false;
   }
 
