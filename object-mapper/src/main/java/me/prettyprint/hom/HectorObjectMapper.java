@@ -33,6 +33,7 @@ import me.prettyprint.hom.annotations.Column;
 import me.prettyprint.hom.cache.HectorObjectMapperException;
 import me.prettyprint.hom.converters.Converter;
 import me.prettyprint.hom.converters.DefaultConverter;
+import me.prettyprint.hom.mapping.PropertyMappingDefinitionEmbeddable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -353,15 +354,10 @@ public class HectorObjectMapper {
         true);
     try {
       Map<String, HColumn<String, byte[]>> colSet = new HashMap<String, HColumn<String, byte[]>>();
-      Collection<PropertyMappingDefinition> coll = cfMapDef.getAllProperties();
-      for (PropertyMappingDefinition md : coll) {
-        Collection<HColumn<String, byte[]>> colColl = createColumnsFromProperty(obj, md);
-        if (null != colColl) {
-          for (HColumn<String, byte[]> col : colColl) {
-            colSet.put(col.getName(), col);
-          }
-        }
-      }
+
+      // Call to recursive function used to manage columns definitions for
+      // properties
+      createColumnsFromProperties(obj, cfMapDef.getAllProperties(), colSet, "");
 
       if (null != cfMapDef.getCfBaseMapDef()) {
         CFMappingDef<?> cfSuperMapDef = cfMapDef.getCfBaseMapDef();
@@ -385,6 +381,76 @@ public class HectorObjectMapper {
       throw new RuntimeException(e);
     } catch (InvocationTargetException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Create columns content recursively for a collection of properties mapping
+   * definitions.
+   * 
+   * @param obj
+   *          Object defining values associated to properties.
+   * @param props
+   *          Collection of properties for object.
+   * @param colSet
+   *          Result columns containing column names and associated values.
+   * @param namePrefix
+   *          Prefix to use for column names, used for recursive calls.
+   * @throws SecurityException
+   * @throws IllegalArgumentException
+   * @throws NoSuchFieldException
+   * @throws IllegalAccessException
+   * @throws InvocationTargetException
+   */
+  @SuppressWarnings("unchecked")
+  private <T> void createColumnsFromProperties(T obj, Collection<PropertyMappingDefinition> props,
+      Map<String, HColumn<String, byte[]>> colSet, String namePrefix) throws SecurityException,
+      IllegalArgumentException, NoSuchFieldException, IllegalAccessException,
+      InvocationTargetException {
+    // All properties
+    for (PropertyMappingDefinition md : props) {
+      Collection<HColumn<String, byte[]>> resultCols = null;
+
+      // Collection
+      if (md.isCollectionType()) {
+        resultCols = createColumnsFromCollectionProperty(obj, md);
+      }
+      // Embedded object
+      else if (md.isEmbeddedType()) {
+        // Embeddable object instance
+        Object retVal = reflectionHelper.invokeGetter(obj, md);
+
+        // Embeddable object properties
+        PropertyMappingDefinitionEmbeddable embPropMapDef = (PropertyMappingDefinitionEmbeddable) md;
+
+        // Prefix to use for children properties (Embedded name + Embedded name
+        // separator)
+        String childrenPrefix = namePrefix + embPropMapDef.getColName()
+            + embPropMapDef.getNameSeparator();
+
+        // Recursive call
+        if (retVal != null) {
+          createColumnsFromProperties((T) retVal, embPropMapDef.getPropertiesMappingDefs()
+                                                               .getMappedProps(), colSet,
+              childrenPrefix);
+        }
+      }
+      // Standard type
+      else {
+        byte[] colValue = createBytesFromPropertyValue(obj, md);
+        if (null == colValue) {
+          resultCols = null;
+        } else {
+          resultCols = Arrays.asList(createHColumn(md.getColName(), colValue));
+        }
+      }
+
+      // Update result list using columns prefix name
+      if (null != resultCols) {
+        for (HColumn<String, byte[]> col : resultCols) {
+          colSet.put(namePrefix + col.getName(), col);
+        }
+      }
     }
   }
 
@@ -419,21 +485,6 @@ public class HectorObjectMapper {
           HFactory.createColumn(entry.getKey(),
               cfMapDef.getAnonymousValueSerializer().toBytes(entry.getValue()),
               StringSerializer.get(), BytesArraySerializer.get()));
-    }
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  private <T> Collection<HColumn<String, byte[]>> createColumnsFromProperty(T obj,
-      PropertyMappingDefinition md) throws SecurityException, NoSuchFieldException,
-      IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-    if (!md.isCollectionType()) {
-      byte[] colValue = createBytesFromPropertyValue(obj, md);
-      if (null == colValue) {
-        return null;
-      }
-      return Arrays.asList(createHColumn(md.getColName(), colValue));
-    } else {
-      return createColumnsFromCollectionProperty(obj, md);
     }
   }
 
